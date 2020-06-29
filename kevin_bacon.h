@@ -12,7 +12,6 @@ Disciplina: SCC0503
 #include <stdlib.h>
 
 /* Defines */
-#define debug 1 // Flag de debugar, quando ativa
 
 
 /* Headers */
