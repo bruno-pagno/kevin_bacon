@@ -5,18 +5,19 @@ Professor: Elaine Parros Machado de Sousa
 Disciplina: SCC0503
 */
 
-#ifndef kevin_bacon
-#define kevin_bacon
+#ifndef _KEVIN_BACON_
+#define _KEVIN_BACON_
 
 #include <stdio.h>
 #include <stdlib.h>
 
-// Defines
+/* Defines */
 #define debug 1 // Flag de debugar, quando ativa
 
 
-// Headers
-int showMenu();
+/* Headers */
+int show_menu();
+void read_input();
 
 
 #endif
