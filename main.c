@@ -44,6 +44,7 @@ int main() {
 	}
 
 	printf("Finalizando execução e liberando o grafo ... \n");
+	/* liberar grafo */
 	return 0;
 }
 
@@ -80,8 +81,7 @@ void read_input() {
 			line[i++] = aux;
 		line[i] = '\0';
 
-		if(i == 0)
-			break;
+		if(i == 0) break;
 
 		if(DEBUG)
 			printf("[%d] %s\n", i, line);	/* linha toda */

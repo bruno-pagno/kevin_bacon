@@ -1,20 +1,25 @@
 #include <stdlib.h>
+#include <string.h>
 #include <graph.h>
 
 /* criacao e inicializacao do grafo */
-GRAPH * create_graph(int num_vertex) {
-	if(num_vertex < 1)	/* previne numero de arestas invalido */
-		exit(0);
-	
-	GRAPH *new_graph = (GRAPH *) malloc(sizeof(GRAPH));
-	new_graph->num_vertex = num_vertex;
-	new_graph->edges = (EDGE **) malloc(num_vertex * sizeof(EDGE *));
+GRAPH * create_graph() {
+	return (GRAPH *) calloc(1, sizeof(GRAPH));
+}
 
-	int i = 0;
-	for(; i < num_vertex; i++)	/* inicializa os vetores de arestas */
-		new_graph->edges[i] = NULL;
+VERTEX * insert_vertex(GRAPH *graph, char *actor_name) {
+	if(!graph)
+		return NULL;
 	
-	return new_graph;
+	VERTEX *new_vertex = (VERTEX *) malloc(sizeof(VERTEX));
+	new_vertex->index = graph->num_vertex;
+	strcpy(new_vertex->actor_name, actor_name);
+
+	graph->vertex = (VERTEX **) realloc(graph->vertex, (graph->num_vertex + 1) * sizeof(VERTEX *));
+	graph->vertex[graph->num_vertex] = new_vertex;
+	graph->num_vertex++;
+
+	return new_vertex;
 }
 
 /* insercao de uma aresta */
