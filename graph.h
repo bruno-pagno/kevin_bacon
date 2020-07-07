@@ -27,17 +27,12 @@ typedef struct {
 
 /* cabecalhos das funcoes */
 GRAPH * create_graph();
-int insert_edge(GRAPH *, int, int, int);
-int exists_edge(GRAPH *, int, int);
-int have_adjacent(GRAPH *, int);
-/*  EDGE * get_first_adjacent(GRAPH *, int);*/
-int next_adjacent(GRAPH *, int, int);
-int get_edge_weight(GRAPH *, int, int);
-int remove_edge(GRAPH *, int, int);
-void free_graph(GRAPH *);
 
 char ** insertVertex(GRAPH * graph, char * actor_name);
 int * insertEdge (GRAPH * graph, int v1, int v2, int elem);
+
+int bfs(GRAPH * graph) ;
+int _bfs(GRAPH * graph, int index);
 /* funcoes pedidas 
 VERTEX * end_vertex(GRAPH *, EDGE *);
 VERTEX * opposite(GRAPH *, VERTEX *, EDGE *);
@@ -47,5 +42,6 @@ int replace_vertex(GRAPH *, VERTEX *, char *);
 char * edge_value(GRAPH *, EDGE *);
 char * vertex_value(GRAPH *, VERTEX *); 
 */
+void free_graph(GRAPH *);
 
 #endif

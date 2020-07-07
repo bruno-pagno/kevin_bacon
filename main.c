@@ -36,7 +36,7 @@ int main() {
 		result = show_menu();
 		switch (result) {
 			case 1:		/* consultar numero de KB */
-
+				bfs(graph);
 				break;
 			case 2:		/* media e desvio padrao */
 
@@ -162,11 +162,34 @@ char ** insertVertex(GRAPH * graph, char * actor_name) {
 	for(k = 0; k < graph->num_vertex ; k++)
 		graph->edges[graph->num_vertex -1][k] = graph->edges[k][graph->num_vertex -1] = VAZIO;
 	
-	return &actor_name;
+	return &graph->vertex[graph->num_vertex - 1];
 }
-
 
 int * insertEdge (GRAPH * graph, int v1, int v2, int elem) {
 	graph->edges[v1][v2] = graph->edges[v2][v1] = elem;
 	return &graph->edges[v1][v2];
+}
+
+int bfs(GRAPH * graph) {
+	if(!graph){
+		printf("Grafo inválido\n");
+		exit(1);
+	}
+
+	char actorname[70];
+	scanf(" %[^\n]s", actorname);
+	printf("actor name: %s\n", actorname);
+	int i;
+	for(i = 0; i < graph->num_vertex; i++)
+		if(!strcmp(graph->vertex[i], actorname)){
+			printf("O ator existe no grafo :-)\n");
+			return 1;
+		}
+	
+	printf("O ator não existe no grafo :-(\n");
+	return -1;
+}
+
+int _bfs(GRAPH * graph, int index) {
+
 }
