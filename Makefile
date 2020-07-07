@@ -1,4 +1,7 @@
 all:
+	make compile && make run
+
+compile:
 	gcc *.c *.h -I . -ansi -o kevin_bacon
 
 run:
