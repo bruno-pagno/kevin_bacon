@@ -18,6 +18,7 @@ OBSERVAÇÕES:
 #include <string.h>
 #include <kevin_bacon.h>
 #include <graph.h>
+#include <queue.h>
 
 #define DEBUG 1
 
@@ -191,5 +192,18 @@ int bfs(GRAPH * graph) {
 }
 
 int _bfs(GRAPH * graph, int index) {
-	printf("Iniciando a bfs buscando o ator %s\n", graph->vertex[index]);
+	printf("Iniciando a bfs buscando o ator %s (%d)\n", graph->vertex[index], index);
+	printf("O grafo tem %d vertices\n", graph->num_vertex);
+	/* Criando a fila */
+	QUEUE * queue = create_queue();
+	
+	/* Fazendo a Breadth First Search */
+	int i;
+	
+	for(i = 0; i < graph->num_vertex; i++)
+		if(graph->edges[index][i] != VAZIO)
+			printf("%s atuou no filme %s com o ator(a) %s\n", graph->vertex[index], graph->movies[graph->edges[index][i]], graph->vertex[i]);
+
+	/* Liberando a fila */
+	free_queue(queue);
 }
