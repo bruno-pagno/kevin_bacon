@@ -31,19 +31,20 @@ int main() {
 	read_input(graph);
 
 	/* Interação com o usuário */
-	int result = 0;
-	while(result != 3){
+	int result = 1;
+	while(result == 1 || result == 2){
 		result = show_menu();
-		switch (result) {
-			case 1:		/* consultar numero de KB */
+		switch(result) {
+			case 1:
 				bfs(graph);
 				break;
-			case 2:		/* media e desvio padrao */
-
+			case 2:
+				printf("a\n");
 				break;
 		}
 	}
 
+	printf("Result is %d\n", result);
 	printf("Finalizando execução e liberando o grafo ... \n");
 	/* liberar grafo */
 	return 0;
@@ -52,15 +53,14 @@ int main() {
 /* Funçoes */
 int show_menu() {
 	int result = 0;
-	while(result < 1 || result > 3) {
-		printf("\n");
-		printf("|------------------------MENU------------------------|\n");
-		printf("|1 - Consultar numero de Kevin Bacon de um ator/atriz|\n");
-		printf("|2 - Média / Desvio Padrão do universo Kevin Bacon   |\n");
-		printf("|3 - Sair do programa                                |\n");
-		printf("|----------------------------------------------------|\n");
-		scanf("%d", &result);
-	}
+	printf("\n");
+	printf("|------------------------MENU------------------------|\n");
+	printf("|1 - Consultar numero de Kevin Bacon de um ator/atriz|\n");
+	printf("|2 - Média / Desvio Padrão do universo Kevin Bacon   |\n");
+	printf("|3 - Sair do programa                                |\n");
+	printf("|----------------------------------------------------|\n");
+	scanf("%d", &result);
+	
 	return result;
 }
 
@@ -175,14 +175,14 @@ int bfs(GRAPH * graph) {
 		printf("Grafo inválido\n");
 		exit(1);
 	}
-
+	printf("Digite o nome do ator que deseja buscar: ");
 	char actorname[70];
 	scanf(" %[^\n]s", actorname);
 	printf("actor name: %s\n", actorname);
 	int i;
 	for(i = 0; i < graph->num_vertex; i++)
 		if(!strcmp(graph->vertex[i], actorname)){
-			printf("O ator existe no grafo :-)\n");
+			_bfs(graph, i);
 			return 1;
 		}
 	
@@ -191,5 +191,5 @@ int bfs(GRAPH * graph) {
 }
 
 int _bfs(GRAPH * graph, int index) {
-
+	printf("Iniciando a bfs buscando o ator %s\n", graph->vertex[index]);
 }
