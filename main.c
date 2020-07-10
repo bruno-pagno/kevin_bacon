@@ -16,28 +16,26 @@ OBSERVAÇÕES:
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <kevin_bacon.h>
 #include <graph.h>
-#include <queue.h>
 
-#define DEBUG 1
+#define DEBUG 0
+#define FILE_NAME "input-top-grossing.txt"
 
-int show_menu();
-void read_inputs(GRAPH *);
+int showMenu();
+void readInsertInputs(GRAPH *);
+void printAdjacents(GRAPH *);
 
 int main() {
-	printf("construindo o grafo com o arquivo input-top-grossing.txt\n");
-		/* Construir o grafo */
 	GRAPH * graph = create_graph(); /* Cria o grafo */ 
-	read_input(graph);
+	readInsertInputs(graph);
 
 	/* Interação com o usuário */
 	int result = 1;
 	while(result == 1 || result == 2){
-		result = show_menu();
+		result = showMenu();
 		switch(result) {
 			case 1:
-				bfs(graph);
+				printAdjacents(graph);
 				break;
 			case 2:
 				printf("a\n");
@@ -45,14 +43,15 @@ int main() {
 		}
 	}
 
-	printf("Result is %d\n", result);
+	if(DEBUG)
+		printf("Result is %d\n", result);
 	printf("Finalizando execução e liberando o grafo ... \n");
 	/* liberar grafo */
 	return 0;
 }
 
 /* Funçoes */
-int show_menu() {
+int showMenu() {
 	int result = 0;
 	printf("\n");
 	printf("|------------------------MENU------------------------|\n");
@@ -65,145 +64,98 @@ int show_menu() {
 	return result;
 }
 
-void read_input( GRAPH * graph) {
-	FILE *arq_input = fopen("input-top-grossing.txt", "r");
+MOVIE * __newMovie(char movie_name[]) {
+	MOVIE *movie = (MOVIE *) malloc(sizeof(MOVIE));
+	strcpy(movie->movie_name, movie_name);
+	movie->num_actors = 0;
+	movie->actors_indexes = NULL;
+
+	return movie;
+}
+
+void __addActor(MOVIE *movie, int index) {
+	movie->actors_indexes = (int *) realloc(movie->actors_indexes, (movie->num_actors + 1) * sizeof(int));
+	movie->actors_indexes[movie->num_actors++] = index;
+}
+
+void __addEdges(GRAPH *graph, MOVIE *movie) {
+	int i = 0, j;
+	int movie_index = getMovieIndex(graph, movie->movie_name);
+	for(; i < movie->num_actors; i++)
+		for(j = i + 1; j < movie->num_actors; j++) {
+			insertEdge(graph, movie->actors_indexes[i], movie->actors_indexes[j], movie_index);
+			insertEdge(graph, movie->actors_indexes[j], movie->actors_indexes[i], movie_index);
+		}
+	if(DEBUG) printf("%d atores relacionados\n", movie->num_actors);
+		
+}
+
+void __readLine(FILE *arq_input, char line[]) {
+	/* leitura das linhas por completo */
+	char aux;
+	int i = 0;
+	while(fscanf(arq_input, "%c", &aux) != EOF && aux != '\n')
+		line[i++] = aux;
+	line[i] = '\0';
+}
+
+void readInsertInputs(GRAPH * graph) {
+	FILE *arq_input = fopen(FILE_NAME, "r");
 	if(!arq_input) {
 		printf("Erro ao abrir arquivo...\n");
 		exit(0);
 	}
 
-	while(1) {
-		char line[2000];
-		strcpy(line, "");
-		int i = 0;
-
-		/* leitura das linhas por completo */
-		char aux;
-		while(fscanf(arq_input, "%c", &aux) != EOF && aux != '\n')
-			line[i++] = aux;
-		line[i] = '\0';
-
-		if(i == 0) break;
-
-		if(DEBUG)
-			printf("[%d] %s\n", i, line);	/* linha toda */
-
-		char *movie_name = strtok(line, "/");
-		char *actor_name = strtok(NULL, "/");
-		int *adjacentes = NULL;
-		int count_adjacents = 0;
-
-		/* Inserindo o filme no vetor de filmes do grafo */
-		graph->num_movies++;
-		graph->movies = (char **) realloc(graph->movies, (graph->num_movies * sizeof(char*)));
-		graph->movies[graph->num_movies - 1] = (char *) malloc(60 * sizeof(char));
-		strcpy(graph->movies[graph->num_movies - 1], movie_name);
+	char line[2000];
+	__readLine(arq_input, line);
+	while(strlen(line)) {	/* para cada filme */
+		if(DEBUG) printf("\n\t%s\n", line);	/* linha toda */
 		
-		if(DEBUG)
-			printf("Filme %s inserido\n", movie_name); 
+		MOVIE *movie = __newMovie(strtok(line, "/"));
 
-		while(actor_name) {
-			if(DEBUG)
-				printf("\n\t%s\n", actor_name);
+		char *actor_name = strtok(NULL, "/");
+		while(actor_name) {	/* para cada ator */
+			int actor_index = insertVertex(graph, actor_name);
+			__addActor(movie, actor_index);
 
-			int j, k;
-			/* Verificando se o ator já foi colocado antes */
-			for(j = 0; j < graph->num_vertex; j++) {
-				if(!strcmp(actor_name, graph->vertex[j]))
-					break; 
-			}
+			if(DEBUG) printf("\t%s\t(%d)\n", actor_name, actor_index);
 			
-			if(DEBUG)
-				printf("O grafo tem %d vertices\n", graph->num_vertex);
-
-			if(j == graph->num_vertex) {/* Neste caso, devemos inserir um novo ator */
-				insertVertex(graph, actor_name);  
-			} 
-			
-			adjacentes = (int *) realloc(adjacentes, (count_adjacents + 1) * sizeof(int));
-			adjacentes[count_adjacents++] = j;
 			actor_name = strtok(NULL, "/");
-
-
-		}
-		if(DEBUG){
-			for(i = 0; i < count_adjacents ; i++)
-				printf("%d ", adjacentes[i]);
-			printf("\n");
 		}
 
-		/* Ligando as arestas */
-		int j;
-		for(i = 0; i < count_adjacents ; i++)
-			for(j = i + 1; j < count_adjacents ; j++){
-				/* graph->edges[i][j] = graph->edges[j][i] = graph->num_movies - 1; */
-				insertEdge(graph, i, j, (graph->num_movies - 1));
-			}
+		int movie_index = insertMovie(graph, movie->movie_name);
+		if(DEBUG)
+			printf("\t\tO filme %s é o %dº filme, com %d atores\n", movie->movie_name, movie_index + 1, movie->num_actors);
+
+		__addEdges(graph, movie);
+
+		__readLine(arq_input, line);
 	}
-	fclose(arq_input);
-}
-
-
-char ** insertVertex(GRAPH * graph, char * actor_name) {
-	graph->num_vertex++;
-	graph->vertex = (char **) realloc(graph->vertex, (graph->num_vertex * sizeof(char *)));
-	graph->vertex[graph->num_vertex - 1] = (char *) malloc(100 * sizeof(char));
-	strcpy(graph->vertex[graph->num_vertex - 1], actor_name);
-	int k;
 	if(DEBUG)
-		printf("Adicionei %s\n", graph->vertex[graph->num_vertex - 1]);
-	
-	graph->edges = (int **) realloc(graph->edges, (graph->num_vertex * sizeof(int *)));	
-	graph->edges[graph->num_vertex - 1] = NULL;
-
-	for(k = 0; k < graph->num_vertex ; k++)
-		graph->edges[k] = (int *) realloc(graph->edges[k], (graph->num_vertex * sizeof(int))); 
-	
-
-	for(k = 0; k < graph->num_vertex ; k++)
-		graph->edges[graph->num_vertex -1][k] = graph->edges[k][graph->num_vertex -1] = VAZIO;
-	
-	return &graph->vertex[graph->num_vertex - 1];
+		printf("%d atores contabilizados\n", graph->num_vertex);
 }
 
-int * insertEdge (GRAPH * graph, int v1, int v2, int elem) {
-	graph->edges[v1][v2] = graph->edges[v2][v1] = elem;
-	return &graph->edges[v1][v2];
-}
+void printAdjacents(GRAPH *graph) {
+	char actor_name[30];
+	printf("\tDigite o nome do ator: ");
+	scanf(" %[^\n]s", actor_name);
 
-int bfs(GRAPH * graph) {
-	if(!graph){
-		printf("Grafo inválido\n");
-		exit(1);
-	}
-	printf("Digite o nome do ator que deseja buscar: ");
-	char actorname[70];
-	scanf(" %[^\n]s", actorname);
-	printf("actor name: %s\n", actorname);
-	int i;
-	for(i = 0; i < graph->num_vertex; i++)
-		if(!strcmp(graph->vertex[i], actorname)){
-			_bfs(graph, i);
-			return 1;
+	int actor_index = getActorIndex(graph, actor_name);
+	if(actor_index == VAZIO)
+		printf("Não encontrado...\n");
+	else {
+		int i = 0;
+		printf("\n");
+		for(; i < graph->num_vertex; i++) {
+			int movie_index = graph->edges[actor_index][i];
+			if(movie_index != VAZIO) {
+				char other_actor[30];
+				char movie_name[60];
+				strcpy(other_actor, graph->actors_names[i]);
+				strcpy(movie_name, graph->movies_names[movie_index]);
+				
+				printf("\t%s atuou com %s em %s\n", actor_name, other_actor, movie_name);
+			}
 		}
-	
-	printf("O ator não existe no grafo :-(\n");
-	return -1;
-}
-
-int _bfs(GRAPH * graph, int index) {
-	printf("Iniciando a bfs buscando o ator %s (%d)\n", graph->vertex[index], index);
-	printf("O grafo tem %d vertices\n", graph->num_vertex);
-	/* Criando a fila */
-	QUEUE * queue = create_queue();
-	
-	/* Fazendo a Breadth First Search */
-	int i;
-	
-	for(i = 0; i < graph->num_vertex; i++)
-		if(graph->edges[index][i] != VAZIO)
-			printf("%s atuou no filme %s com o ator(a) %s\n", graph->vertex[index], graph->movies[graph->edges[index][i]], graph->vertex[i]);
-
-	/* Liberando a fila */
-	free_queue(queue);
+	}
 }

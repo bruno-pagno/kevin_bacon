@@ -1,5 +1,6 @@
 all:
-	make compile && make run
+	gcc *.c *.h -I . -ansi -o kevin_bacon
+	./kevin_bacon
 
 compile:
 	gcc *.c *.h -I . -ansi -o kevin_bacon

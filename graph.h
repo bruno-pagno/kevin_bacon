@@ -7,32 +7,44 @@
 #define INDEX_ERROR	-2
 #define NOT_FOUND	-3
 
+#define VAZIO  -1
+
 /* cores da visitação */
 #define WHITE	0
 #define GREY	1
 #define BLACK	2
-#define VAZIO  -1
 
-#define VERTEX int *
-#define EDGE int *
+#define MAX_VERTEX 8300
+#define MAX_MOVIES 200
+
+/* estrutura auxiliar de filme */
+typedef struct {
+	char movie_name[60];
+	int num_actors;
+	int *actors_indexes;
+} MOVIE;
 
 /* estruturas que compoem o grafo */
 typedef struct {
-	int num_vertex;
-	int num_movies;
-	char ** movies;
-	char ** vertex;		 /* Guarda os vértices */
-	int ** edges;		 /* Guarda as arestas com os filmes */
+	int num_vertex, num_movies;
+	char *actors_names[MAX_VERTEX];		 /* Guarda os vértices */
+	char *movies_names[MAX_MOVIES];
+	int edges[MAX_VERTEX][MAX_VERTEX];		 /* Guarda as arestas com os filmes */
 } GRAPH;
 
 /* cabecalhos das funcoes */
 GRAPH * create_graph();
 
-char ** insertVertex(GRAPH * graph, char * actor_name);
-int * insertEdge (GRAPH * graph, int v1, int v2, int elem);
+int getActorIndex(GRAPH *, char *);
+int getActorIndex(GRAPH *, char *);
 
-int bfs(GRAPH * graph) ;
-int _bfs(GRAPH * graph, int index);
+int insertVertex(GRAPH *, char *);
+int insertMovie(GRAPH *, char *);
+int * insertEdge (GRAPH *, int, int, int);
+
+void breadth_search(GRAPH *);
+
+
 /* funcoes pedidas 
 VERTEX * end_vertex(GRAPH *, EDGE *);
 VERTEX * opposite(GRAPH *, VERTEX *, EDGE *);
