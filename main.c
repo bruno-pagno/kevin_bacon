@@ -17,6 +17,7 @@ OBSERVAÇÕES:
 #include <stdlib.h>
 #include <string.h>
 #include <graph.h>
+#include <queue.h>
 
 #define DEBUG 1
 #define FILE_NAME "input-top-grossing.txt"
@@ -141,11 +142,16 @@ void printAdjacents(GRAPH *graph) {
 	scanf(" %[^\n]s", actor_name);
 
 	int actor_index = getActorIndex(graph, actor_name);
+	int kevin_bacon_index = getActorIndex(graph, "Bacon, Kevin");
+
+
 	if(actor_index == VAZIO)
 		printf("Não encontrado...\n");
 	else {
 		int i = 0;
 		printf("\n");
+		
+		/*
 		for(; i < graph->num_vertex; i++) {
 			int movie_index = graph->edges[actor_index][i];
 			if(movie_index != VAZIO) {
@@ -153,9 +159,60 @@ void printAdjacents(GRAPH *graph) {
 				char movie_name[60];
 				strcpy(other_actor, graph->actors_names[i]);
 				strcpy(movie_name, graph->movies_names[movie_index]);
-				
+
 				printf("\t%s atuou com %s em %s\n", actor_name, other_actor, movie_name);
 			}
 		}
+		*/
+		printf("O ator tem indice %d e o Kevin Bacon tem indice %d\n", actor_index, kevin_bacon_index);
+
+		/*  Criando o vetor de antecessores */
+		int * vetAnt  = (int *) malloc(graph->num_vertex * sizeof(int));
+		int * visited  = (int *) malloc(graph->num_vertex * sizeof(int));
+		for(i =0; i < graph->num_vertex; i++) 
+			vetAnt[i] = visited[i] = VAZIO;
+		/*  Criando a pilha */
+		QUEUE * queue = create_queue();
+		/*  Colocando o valor inicial na pilha (Indice do ator desejado) */
+		push_queue(queue, actor_index);
+		/*  Enquanto houver pilha */
+		while(queue->size) {
+			int queueElem = pop_queue(queue);/*  Pega o elemento do topo da pilha */
+
+			for(i = 0; i < graph->num_vertex; i++) { /* Passa por todos os elementos */
+
+				if(graph->edges[queueElem][i] != VAZIO && vetAnt[i] == VAZIO && visited[i] != 1) { /* Se for adjancente*/
+					vetAnt[i] = queueElem;
+					push_queue(queue, i); /* Adiciona na pilha */
+				}
+			}
+
+			visited[queueElem] = 1;
+
+		}
+		/* Vetor de antecessores finalizado */
+		if(DEBUG)
+			printf("Vetor de antecessores finalizado, vetant[kb] = %d\n", vetAnt[kevin_bacon_index]);
+
+		if(DEBUG){
+		for(i = 0; i < graph->num_vertex; i++)
+			printf("[%d]%d ", i, vetAnt[i]);
+		printf("\n");
+		}
+
+		int current = vetAnt[kevin_bacon_index];
+		int caminho[100], count = 0;
+
+		while(current != actor_index && current != -1) {
+			caminho[count++] = current;
+			current = vetAnt[current];
+		}
+
+		for(i = 0; i < count ; i++)
+			printf("%s atuou com %s em %s\n", actor_name, graph->actors_names[caminho[i]], graph->movies_names[graph->edges[actor_index][caminho[i]]]);
+		printf("%s atuou com %s em %s\n", graph->actors_names[caminho[count - 1]], graph->actors_names[kevin_bacon_index], graph->movies_names[graph->edges[kevin_bacon_index][caminho[count -1]]]);
+		
+
+		printf("%s tem kb = %d\n", actor_name, count);
 	}
 }
