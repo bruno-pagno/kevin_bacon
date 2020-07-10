@@ -27,9 +27,9 @@ typedef struct {
 /* estruturas que compoem o grafo */
 typedef struct {
 	int num_vertex, num_movies;
-	char *actors_names[MAX_VERTEX];		 /* Guarda os vértices */
+	char *actors_names[MAX_VERTEX];			/* Guarda os vértices */
 	char *movies_names[MAX_MOVIES];
-	int edges[MAX_VERTEX][MAX_VERTEX];		 /* Guarda as arestas com os filmes */
+	int edges[MAX_VERTEX][MAX_VERTEX];		/* Guarda as arestas com os filmes */
 } GRAPH;
 
 /* cabecalhos das funcoes */

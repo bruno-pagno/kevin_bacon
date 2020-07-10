@@ -18,7 +18,7 @@ OBSERVAÇÕES:
 #include <string.h>
 #include <graph.h>
 
-#define DEBUG 0
+#define DEBUG 1
 #define FILE_NAME "input-top-grossing.txt"
 
 int showMenu();
@@ -92,11 +92,10 @@ void __addEdges(GRAPH *graph, MOVIE *movie) {
 
 void __readLine(FILE *arq_input, char line[]) {
 	/* leitura das linhas por completo */
-	char aux;
-	int i = 0;
-	while(fscanf(arq_input, "%c", &aux) != EOF && aux != '\n')
-		line[i++] = aux;
-	line[i] = '\0';
+	char aux[2] = "\0";
+	strcpy(line, "");
+	while(fscanf(arq_input, "%c", &aux[0]) != EOF && aux[0] != '\n')
+		strcat(line, aux);
 }
 
 void readInsertInputs(GRAPH * graph) {
@@ -109,6 +108,7 @@ void readInsertInputs(GRAPH * graph) {
 	char line[2000];
 	__readLine(arq_input, line);
 	while(strlen(line)) {	/* para cada filme */
+		line[strlen(line) - 1] = '\0';
 		if(DEBUG) printf("\n\t%s\n", line);	/* linha toda */
 		
 		MOVIE *movie = __newMovie(strtok(line, "/"));
@@ -118,7 +118,7 @@ void readInsertInputs(GRAPH * graph) {
 			int actor_index = insertVertex(graph, actor_name);
 			__addActor(movie, actor_index);
 
-			if(DEBUG) printf("\t%s\t(%d)\n", actor_name, actor_index);
+			if(DEBUG) printf("\t%4d) [%02d] {%s}\n", actor_index, strlen(actor_name), actor_name);
 			
 			actor_name = strtok(NULL, "/");
 		}
