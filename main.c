@@ -39,7 +39,7 @@ int main() {
 				printAdjacents(graph);
 				break;
 			case 2:
-				printf("a\n");
+				kb_word(graph);
 				break;
 		}
 	}
@@ -180,24 +180,21 @@ void printAdjacents(GRAPH *graph) {
 			int queueElem = pop_queue(queue);/*  Pega o elemento do topo da pilha */
 
 			for(i = 0; i < graph->num_vertex; i++) { /* Passa por todos os elementos */
-
 				if(graph->edges[queueElem][i] != VAZIO && vetAnt[i] == VAZIO && visited[i] != 1) { /* Se for adjancente*/
 					vetAnt[i] = queueElem;
 					push_queue(queue, i); /* Adiciona na pilha */
 				}
 			}
-
 			visited[queueElem] = 1;
-
 		}
 		/* Vetor de antecessores finalizado */
 		if(DEBUG)
 			printf("Vetor de antecessores finalizado, vetant[kb] = %d\n", vetAnt[kevin_bacon_index]);
 
 		if(DEBUG){
-		for(i = 0; i < graph->num_vertex; i++)
-			printf("[%d]%d ", i, vetAnt[i]);
-		printf("\n");
+			for(i = 0; i < graph->num_vertex; i++)
+				printf("[%d]%d ", i, vetAnt[i]);
+			printf("\n");
 		}
 
 		int current = vetAnt[kevin_bacon_index];
@@ -215,4 +212,45 @@ void printAdjacents(GRAPH *graph) {
 
 		printf("%s tem kb = %d\n", actor_name, count);
 	}
+}
+
+
+int kb_word(GRAPH * graph) {
+	int kevin_bacon_index = getActorIndex(graph, "Bacon, Kevin");	
+	int * kb_index  = (int *) malloc(graph->num_vertex * sizeof(int));
+	int i, j;	
+	for(i =0; i < graph->num_vertex; i++) 
+		kb_index[i] = VAZIO;
+
+	kb_index[kevin_bacon_index] = 0; /* Colocando zero no Indice de Kb do Kevin Bacon */
+	int haveToContinue = 1, current_index = 0;
+	
+	/* Encontrando todos os indices de Kb */
+	while(haveToContinue) {
+		haveToContinue = 0;
+
+		for(i = 0; i < graph->num_vertex; i++)
+			if(kb_index[i] == current_index)
+				for(j = 0; j < graph->num_vertex; j++)
+					if(graph->edges[i][j] != VAZIO && kb_index[j] == VAZIO) {
+						haveToContinue = 1;
+						kb_index[j] = current_index + 1;
+					}
+
+		current_index++;
+	}
+
+	int sum = 0;
+
+	if(DEBUG)
+		printf("Achei todos os Kbs\n");
+
+	for(i =0; i < graph->num_vertex; i++) 	{
+		printf("%s tem Kb = %d\n", graph->actors_names[i], kb_index[i]);
+		
+		if(kb_index[i] != -1) 
+			sum += kb_index[i]; 
+	}
+	float averageKb = (float) sum / graph->num_vertex;
+	printf("A média de Kb dos atores é %.3f", averageKb);
 }
