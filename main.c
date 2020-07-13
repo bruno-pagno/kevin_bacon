@@ -5,26 +5,17 @@ Professor: Elaine Parros Machado de Sousa
 Disciplina: SCC0503
 */
 
-/*
-OBSERVAÇÕES:
-    criei esse main.c pras funcoes entre os .h
-
-	o valor das arestas vai ser o titulo do filme
-	o valor dos vértices vai ser o nome do ator
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <graph.h>
 #include <queue.h>
 
-#define DEBUG 1
+#define DEBUG 0
 #define FILE_NAME "input-top-grossing.txt"
 
 int showMenu();
 void readInsertInputs(GRAPH *);
-void printAdjacents(GRAPH *);
 
 int main() {
 	GRAPH * graph = create_graph(); /* Cria o grafo */ 
@@ -36,7 +27,7 @@ int main() {
 		result = showMenu();
 		switch(result) {
 			case 1:
-				printAdjacents(graph);
+				getKevinBaconNumber(graph);
 				break;
 			case 2:
 				kb_word(graph);
@@ -136,85 +127,6 @@ void readInsertInputs(GRAPH * graph) {
 		printf("%d atores contabilizados\n", graph->num_vertex);
 }
 
-void printAdjacents(GRAPH *graph) {
-	char actor_name[30];
-	printf("\tDigite o nome do ator: ");
-	scanf(" %[^\n]s", actor_name);
-
-	int actor_index = getActorIndex(graph, actor_name);
-	int kevin_bacon_index = getActorIndex(graph, "Bacon, Kevin");
-
-
-	if(actor_index == VAZIO)
-		printf("Não encontrado...\n");
-	else {
-		int i = 0;
-		printf("\n");
-		
-		/*
-		for(; i < graph->num_vertex; i++) {
-			int movie_index = graph->edges[actor_index][i];
-			if(movie_index != VAZIO) {
-				char other_actor[30];
-				char movie_name[60];
-				strcpy(other_actor, graph->actors_names[i]);
-				strcpy(movie_name, graph->movies_names[movie_index]);
-
-				printf("\t%s atuou com %s em %s\n", actor_name, other_actor, movie_name);
-			}
-		}
-		*/
-		printf("O ator tem indice %d e o Kevin Bacon tem indice %d\n", actor_index, kevin_bacon_index);
-
-		/*  Criando o vetor de antecessores */
-		int * vetAnt  = (int *) malloc(graph->num_vertex * sizeof(int));
-		int * visited  = (int *) malloc(graph->num_vertex * sizeof(int));
-		for(i =0; i < graph->num_vertex; i++) 
-			vetAnt[i] = visited[i] = VAZIO;
-		/*  Criando a pilha */
-		QUEUE * queue = create_queue();
-		/*  Colocando o valor inicial na pilha (Indice do ator desejado) */
-		push_queue(queue, actor_index);
-		/*  Enquanto houver pilha */
-		while(queue->size) {
-			int queueElem = pop_queue(queue);/*  Pega o elemento do topo da pilha */
-
-			for(i = 0; i < graph->num_vertex; i++) { /* Passa por todos os elementos */
-				if(graph->edges[queueElem][i] != VAZIO && vetAnt[i] == VAZIO && visited[i] != 1) { /* Se for adjancente*/
-					vetAnt[i] = queueElem;
-					push_queue(queue, i); /* Adiciona na pilha */
-				}
-			}
-			visited[queueElem] = 1;
-		}
-		/* Vetor de antecessores finalizado */
-		if(DEBUG)
-			printf("Vetor de antecessores finalizado, vetant[kb] = %d\n", vetAnt[kevin_bacon_index]);
-
-		if(DEBUG){
-			for(i = 0; i < graph->num_vertex; i++)
-				printf("[%d]%d ", i, vetAnt[i]);
-			printf("\n");
-		}
-
-		int current = vetAnt[kevin_bacon_index];
-		int caminho[100], count = 0;
-
-		while(current != actor_index && current != -1) {
-			caminho[count++] = current;
-			current = vetAnt[current];
-		}
-
-		for(i = 0; i < count ; i++)
-			printf("%s atuou com %s em %s\n", actor_name, graph->actors_names[caminho[i]], graph->movies_names[graph->edges[actor_index][caminho[i]]]);
-		printf("%s atuou com %s em %s\n", graph->actors_names[caminho[count - 1]], graph->actors_names[kevin_bacon_index], graph->movies_names[graph->edges[kevin_bacon_index][caminho[count -1]]]);
-		
-
-		printf("%s tem kb = %d\n", actor_name, count);
-	}
-}
-
-
 int kb_word(GRAPH * graph) {
 	int kevin_bacon_index = getActorIndex(graph, "Bacon, Kevin");	
 	int * kb_index  = (int *) malloc(graph->num_vertex * sizeof(int));
@@ -240,17 +152,17 @@ int kb_word(GRAPH * graph) {
 		current_index++;
 	}
 
+	if(DEBUG) printf("Achei todos os Kbs\n");
+
 	int sum = 0;
-
-	if(DEBUG)
-		printf("Achei todos os Kbs\n");
-
-	for(i =0; i < graph->num_vertex; i++) 	{
-		printf("%s tem Kb = %d\n", graph->actors_names[i], kb_index[i]);
+	for(i = 0; i < graph->num_vertex; i++) {
+		if(DEBUG)
+			printf("%s tem Kb = %d\n", graph->actors_names[i], kb_index[i]);
 		
 		if(kb_index[i] != -1) 
 			sum += kb_index[i]; 
 	}
+
 	float averageKb = (float) sum / graph->num_vertex;
-	printf("A média de Kb dos atores é %.3f", averageKb);
+	printf("\tA média de Kb dos atores é %.3f\n", averageKb);
 }

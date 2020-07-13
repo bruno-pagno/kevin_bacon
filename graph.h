@@ -42,7 +42,7 @@ int insertVertex(GRAPH *, char *);
 int insertMovie(GRAPH *, char *);
 int * insertEdge (GRAPH *, int, int, int);
 
-void breadth_search(GRAPH *);
+void getKevinBaconNumber(GRAPH *);
 int kb_word(GRAPH * graph);
 
 

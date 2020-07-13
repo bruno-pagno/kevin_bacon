@@ -72,37 +72,87 @@ int * insertEdge (GRAPH *graph, int v1, int v2, int movie_index) {
 	return &graph->edges[v1][v2];
 }
 
-void __breadth_search(GRAPH *graph, int vertex, int *colors) {
-	colors[vertex] = GREY;
+void getKevinBaconNumber(GRAPH *graph) {
+	char actor_name[30];
+	printf("\tDigite o nome do ator: ");
+	scanf(" %[^\n]s", actor_name);
 
-	QUEUE *queue = create_queue();
-	push_queue(queue, vertex);
+	int actor_index = getActorIndex(graph, actor_name);
+	int kevin_bacon_index = getActorIndex(graph, "Bacon, Kevin");
 
-	while(queue->size) {
-		vertex = pop_queue(queue);
+	if(actor_index == kevin_bacon_index)
+		printf("\tEste é o próprio Kevin Bacon!\n");
+	
+	else if(actor_index == VAZIO)
+		printf("\tNão possui ligação com Kevin Bacon...\n");
+	
+	else {
+		if(GRAPH_DEBUG)
+			printf("\nO ator tem indice %d e o Kevin Bacon tem indice %d\n", actor_index, kevin_bacon_index);
 
+		/*  Criando o vetor de antecessores */
+		int *vetAnt  = (int *) malloc(graph->num_vertex * sizeof(int));
+		int *visited  = (int *) malloc(graph->num_vertex * sizeof(int));
 		int i = 0;
 		for(; i < graph->num_vertex; i++) {
-			if(graph->edges[vertex][i] != VAZIO) {
-				if(colors[i] == WHITE) {
-					colors[i] = GREY;
-					push_queue(queue, i);
+			vetAnt[i] = VAZIO;
+			visited[i] = 0;
+		}
+		
+		/*  Criando a fila e colocando o indice do ator*/
+		QUEUE * queue = create_queue();
+		push_queue(queue, actor_index);
+
+		/*  Enquanto a fila nao estiver vazia */
+		while(queue->size) {
+			int queueElem = pop_queue(queue);	/*  Pega o elemento do topo da fila */
+
+			for(i = 0; i < graph->num_vertex; i++) {	/* Passa por todos os elementos */
+				if(graph->edges[queueElem][i] != VAZIO && vetAnt[i] == VAZIO && !visited[i]) {
+					/* se for adjacente E nao foi passado no caminho E nao foi visitado */
+					vetAnt[i] = queueElem;	/* faz o adjacente ter o atual como anterior */
+					push_queue(queue, i);	/* Adiciona na fila */
 				}
 			}
+
+			/* marca como visitado */
+			visited[queueElem] = 1;
 		}
-		colors[vertex] = BLACK;
+
+		/* Vetor de antecessores finalizado */
+		if(GRAPH_DEBUG) printf("Vetor de antecessores finalizado, vetant[kb] = %d\n", vetAnt[kevin_bacon_index]);
+
+		if(GRAPH_DEBUG){
+			for(i = 0; i < graph->num_vertex; i++)
+				printf("[%d]%d\n", i, vetAnt[i]);
+			printf("\n");
+		}
+
+		if(vetAnt[kevin_bacon_index] == VAZIO) {
+			printf("\tNão possui ligação com Kevin Bacon...\n");
+			return;
+		}
+
+		int current = kevin_bacon_index;
+		int caminho[100], count = 0;
+
+		while(current != -1) {
+			caminho[count++] = current;
+			current = vetAnt[current];
+		}
+
+		printf("\n");
+		char first_name[50], second_name[50], movie_name[60];
+		for(i = count - 1; i > 0; i--) {
+			strcpy(first_name, graph->actors_names[caminho[i-1]]);
+			strcpy(second_name, graph->actors_names[caminho[i]]);
+
+			int movie_index = graph->edges[caminho[i-1]][caminho[i]];
+			strcpy(movie_name, graph->movies_names[movie_index]);
+
+			printf("\t%s atuou com %s em %s\n", second_name, first_name, movie_name);
+		}
+		
+		printf("\n\t%s tem kb = %d\n", actor_name, count-1);
 	}
-
-	free_queue(queue);
-}
-
-void breadth_search(GRAPH *graph) {
-	int *colors = (int *) malloc(graph->num_vertex * sizeof(int));
-	int i = 0;
-	for(i = 0; i < graph->num_vertex; i++)
-		colors[i] = WHITE;
-	
-	for(i = 0; i < graph->num_vertex; i++) 
-		if(colors[i] == WHITE)
-			__breadth_search(graph, i, colors);
 }
