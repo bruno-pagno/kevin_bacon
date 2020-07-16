@@ -110,7 +110,7 @@ void readInsertInputs(GRAPH * graph) {
 			int actor_index = insertVertex(graph, actor_name);
 			__addActor(movie, actor_index);
 
-			if(DEBUG) printf("\t%4d) [%02d] {%s}\n", actor_index, strlen(actor_name), actor_name);
+			if(DEBUG) printf("\t%4d) [%02d] {%s}\n", actor_index, (int)strlen(actor_name), actor_name);
 			
 			actor_name = strtok(NULL, "/");
 		}
@@ -144,7 +144,7 @@ int kb_word(GRAPH * graph) {
 		for(i = 0; i < graph->num_vertex; i++)
 			if(kb_index[i] == current_index)
 				for(j = 0; j < graph->num_vertex; j++)
-					if(graph->edges[i][j] != VAZIO && kb_index[j] == VAZIO) {
+					if(are_adjacent(graph, i, j) && kb_index[j] == VAZIO) {
 						haveToContinue = 1;
 						kb_index[j] = current_index + 1;
 					}
@@ -178,3 +178,20 @@ int kb_word(GRAPH * graph) {
 	float dpKB = (float) sum_dp / graph->num_vertex;
 	printf("\tO desvio padrão de Kb dos atores é %.3f\n", dpKB);
 }
+
+
+int are_adjacent(GRAPH * graph, int v1, int v2) {
+	return graph->edges[v1][v2] != VAZIO ;
+}
+
+int replace_vertex(GRAPH * graph, int vertex_index, char * newName) {
+	if(!graph)return -3;
+	strcpy(graph->actors_names[vertex_index], newName);
+	return 1;
+}
+
+char * vertex_value(GRAPH * graph, int pos) {
+	if(!graph) return NULL;
+	return graph->actors_names[pos];
+	
+} 

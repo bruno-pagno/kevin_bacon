@@ -33,28 +33,27 @@ typedef struct {
 } GRAPH;
 
 /* cabecalhos das funcoes */
+
 GRAPH * create_graph();
-
 int getActorIndex(GRAPH *, char *);
 int getActorIndex(GRAPH *, char *);
-
-int insertVertex(GRAPH *, char *);
-int insertMovie(GRAPH *, char *);
-int * insertEdge (GRAPH *, int, int, int);
-
 void getKevinBaconNumber(GRAPH *);
 int kb_word(GRAPH * graph);
 
 
+int insertVertex(GRAPH *, char *);
+int insertMovie(GRAPH *, char *);
+int * insertEdge (GRAPH *, int, int, int);
+int are_adjacent(GRAPH *, int, int);
+int replace_vertex(GRAPH *, int, char *);
+char * vertex_value(GRAPH *, int); 
 /* funcoes pedidas 
 VERTEX * end_vertex(GRAPH *, EDGE *);
 VERTEX * opposite(GRAPH *, VERTEX *, EDGE *);
-int are_adjacent(GRAPH *, VERTEX *, VERTEX *);
 int replace_edge(GRAPH *, EDGE *, char *);
-int replace_vertex(GRAPH *, VERTEX *, char *);
 char * edge_value(GRAPH *, EDGE *);
-char * vertex_value(GRAPH *, VERTEX *); 
 */
+
 void free_graph(GRAPH *);
 
 #endif
