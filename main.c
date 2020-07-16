@@ -165,4 +165,16 @@ int kb_word(GRAPH * graph) {
 
 	float averageKb = (float) sum / graph->num_vertex;
 	printf("\tA média de Kb dos atores é %.3f\n", averageKb);
+
+	float sum_dp = 0.0;
+	for(i = 0; i < graph->num_vertex; i++) {
+		if(DEBUG)
+			printf("%s tem Kb = %d\n", graph->actors_names[i], kb_index[i]);
+		
+		if(kb_index[i] != -1) 
+			sum_dp += (kb_index[i] - averageKb) * (kb_index[i] - averageKb); 
+	}
+
+	float dpKB = (float) sum_dp / graph->num_vertex;
+	printf("\tO desvio padrão de Kb dos atores é %.3f\n", dpKB);
 }
