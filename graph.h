@@ -47,13 +47,8 @@ int * insertEdge (GRAPH *, int, int, int);
 int are_adjacent(GRAPH *, int, int);
 int replace_vertex(GRAPH *, int, char *);
 char * vertex_value(GRAPH *, int); 
-/* funcoes pedidas 
-VERTEX * end_vertex(GRAPH *, EDGE *);
-VERTEX * opposite(GRAPH *, VERTEX *, EDGE *);
-int replace_edge(GRAPH *, EDGE *, char *);
-char * edge_value(GRAPH *, EDGE *);
-*/
-
+int edge_value(GRAPH *, int, int);
+int replace_edge(GRAPH *, int v1, int v2, int elem);
 void free_graph(GRAPH *);
 
 #endif

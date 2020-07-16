@@ -195,3 +195,15 @@ char * vertex_value(GRAPH * graph, int pos) {
 	return graph->actors_names[pos];
 	
 } 
+
+int edge_value(GRAPH * graph, int v1, int v2) {
+	if(!graph) return -3;
+	return graph->edges[v1][v2];
+}
+
+
+int replace_edge(GRAPH * graph, int v1, int v2, int elem) {
+	if(!graph) return -3;
+	graph->edges[v1][v2] = elem;
+	return 1;
+}
