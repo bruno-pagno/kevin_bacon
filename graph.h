@@ -6,13 +6,9 @@
 #define FAILED		-1
 #define INDEX_ERROR	-2
 #define NOT_FOUND	-3
+#define KEVIN_BACON	-4
 
 #define VAZIO  -1
-
-/* cores da visitação */
-#define WHITE	0
-#define GREY	1
-#define BLACK	2
 
 #define MAX_VERTEX 8300
 #define MAX_MOVIES 200
@@ -27,28 +23,32 @@ typedef struct {
 /* estruturas que compoem o grafo */
 typedef struct {
 	int num_vertex, num_movies;
-	char *actors_names[MAX_VERTEX];			/* Guarda os vértices */
+	char *actors_names[MAX_VERTEX];		/* Guarda os vértices */
 	char *movies_names[MAX_MOVIES];
-	int edges[MAX_VERTEX][MAX_VERTEX];		/* Guarda as arestas com os filmes */
+	int edges[MAX_VERTEX][MAX_VERTEX];	/* Guarda as arestas com os filmes */
 } GRAPH;
 
 /* cabecalhos das funcoes */
-
 GRAPH * create_graph();
-int getActorIndex(GRAPH *, char *);
-int getActorIndex(GRAPH *, char *);
-void getKevinBaconNumber(GRAPH *);
-int kb_word(GRAPH * graph);
 
-
-int insertVertex(GRAPH *, char *);
-int insertMovie(GRAPH *, char *);
-int * insertEdge (GRAPH *, int, int, int);
-int are_adjacent(GRAPH *, int, int);
+int insert_vertex(GRAPH *, char *);
 int replace_vertex(GRAPH *, int, char *);
 char * vertex_value(GRAPH *, int); 
+
+int * insert_edge(GRAPH *, int, int, int);
+int replace_edge(GRAPH *, int, int, int);
 int edge_value(GRAPH *, int, int);
-int replace_edge(GRAPH *, int v1, int v2, int elem);
+
+int insert_movie(GRAPH *, char *);
+
+int are_adjacent(GRAPH *, int, int);
+
+int get_actor_index(GRAPH *, char *);
+int get_movie_index(GRAPH *, char *);
+
+int get_kevin_bacon_number(GRAPH *, char *, int []);
+float * get_kevin_bacon_average(GRAPH *);
+
 void free_graph(GRAPH *);
 
 #endif

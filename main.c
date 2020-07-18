@@ -9,54 +9,40 @@ Disciplina: SCC0503
 #include <stdlib.h>
 #include <string.h>
 #include <graph.h>
-#include <queue.h>
 
-#define DEBUG 0
 #define FILE_NAME "input-top-grossing.txt"
 
-int showMenu();
-void readInsertInputs(GRAPH *);
+int show_menu();
+void read_inputs(GRAPH *);
+void kevin_bacon_number(GRAPH *);
+void kevin_bacon_average(GRAPH *);
 
 int main() {
-	GRAPH * graph = create_graph(); /* Cria o grafo */ 
-	readInsertInputs(graph);
+	GRAPH * graph = create_graph();		/* Cria o grafo */ 
+	read_inputs(graph);
 
-	/* Interação com o usuário */
+	/* interacao com o usuario */
 	int result = 1;
 	while(result == 1 || result == 2){
-		result = showMenu();
+		result = show_menu();
 		switch(result) {
 			case 1:
-				getKevinBaconNumber(graph);
+				kevin_bacon_number(graph);
 				break;
 			case 2:
-				kb_word(graph);
+				kevin_bacon_average(graph);
 				break;
 		}
 	}
 
-	if(DEBUG)
-		printf("Result is %d\n", result);
-	printf("Finalizando execução e liberando o grafo ... \n");
+	printf("\n\tFinalizando execução e liberando o grafo...\n\n");
 	/* liberar grafo */
+	free_graph(graph);
 	return 0;
 }
 
-/* Funçoes */
-int showMenu() {
-	int result = 0;
-	printf("\n");
-	printf("|------------------------MENU------------------------|\n");
-	printf("|1 - Consultar numero de Kevin Bacon de um ator/atriz|\n");
-	printf("|2 - Média / Desvio Padrão do universo Kevin Bacon   |\n");
-	printf("|3 - Sair do programa                                |\n");
-	printf("|----------------------------------------------------|\n");
-	scanf("%d", &result);
-	
-	return result;
-}
-
-MOVIE * __newMovie(char movie_name[]) {
+/* funcoes auxiliares */
+MOVIE * __new_movie(char movie_name[]) {
 	MOVIE *movie = (MOVIE *) malloc(sizeof(MOVIE));
 	strcpy(movie->movie_name, movie_name);
 	movie->num_actors = 0;
@@ -65,24 +51,23 @@ MOVIE * __newMovie(char movie_name[]) {
 	return movie;
 }
 
-void __addActor(MOVIE *movie, int index) {
+void __add_actor(MOVIE *movie, int index) {
 	movie->actors_indexes = (int *) realloc(movie->actors_indexes, (movie->num_actors + 1) * sizeof(int));
 	movie->actors_indexes[movie->num_actors++] = index;
 }
 
-void __addEdges(GRAPH *graph, MOVIE *movie) {
+void __add_edges(GRAPH *graph, MOVIE *movie) {
 	int i = 0, j;
-	int movie_index = getMovieIndex(graph, movie->movie_name);
+	int movie_index = get_movie_index(graph, movie->movie_name);
 	for(; i < movie->num_actors; i++)
 		for(j = i + 1; j < movie->num_actors; j++) {
-			insertEdge(graph, movie->actors_indexes[i], movie->actors_indexes[j], movie_index);
-			insertEdge(graph, movie->actors_indexes[j], movie->actors_indexes[i], movie_index);
+			insert_edge(graph, movie->actors_indexes[i], movie->actors_indexes[j], movie_index);
+			insert_edge(graph, movie->actors_indexes[j], movie->actors_indexes[i], movie_index);
 		}
-	if(DEBUG) printf("%d atores relacionados\n", movie->num_actors);
 		
 }
 
-void __readLine(FILE *arq_input, char line[]) {
+void __read_line(FILE *arq_input, char line[]) {
 	/* leitura das linhas por completo */
 	char aux[2] = "\0";
 	strcpy(line, "");
@@ -90,7 +75,22 @@ void __readLine(FILE *arq_input, char line[]) {
 		strcat(line, aux);
 }
 
-void readInsertInputs(GRAPH * graph) {
+/* funcoes principais */
+int show_menu() {
+	int result = 0;
+	printf("\n");
+	printf("|------------------------MENU------------------------|\n");
+	printf("|1 - Consultar numero de Kevin Bacon de um ator/atriz|\n");
+	printf("|2 - Média / Desvio Padrão do universo Kevin Bacon   |\n");
+	printf("|3 - Sair do programa                                |\n");
+	printf("|----------------------------------------------------|\n");
+	printf("Opção: ");
+	scanf("%d", &result);
+	
+	return result;
+}
+
+void read_inputs(GRAPH * graph) {
 	FILE *arq_input = fopen(FILE_NAME, "r");
 	if(!arq_input) {
 		printf("Erro ao abrir arquivo...\n");
@@ -98,112 +98,65 @@ void readInsertInputs(GRAPH * graph) {
 	}
 
 	char line[2000];
-	__readLine(arq_input, line);
+	__read_line(arq_input, line);
 	while(strlen(line)) {	/* para cada filme */
 		line[strlen(line) - 1] = '\0';
-		if(DEBUG) printf("\n\t%s\n", line);	/* linha toda */
 		
-		MOVIE *movie = __newMovie(strtok(line, "/"));
+		MOVIE *movie = __new_movie(strtok(line, "/"));
 
 		char *actor_name = strtok(NULL, "/");
 		while(actor_name) {	/* para cada ator */
-			int actor_index = insertVertex(graph, actor_name);
-			__addActor(movie, actor_index);
-
-			if(DEBUG) printf("\t%4d) [%02d] {%s}\n", actor_index, (int)strlen(actor_name), actor_name);
+			int actor_index = insert_vertex(graph, actor_name);
+			__add_actor(movie, actor_index);
 			
 			actor_name = strtok(NULL, "/");
 		}
 
-		int movie_index = insertMovie(graph, movie->movie_name);
-		if(DEBUG)
-			printf("\t\tO filme %s é o %dº filme, com %d atores\n", movie->movie_name, movie_index + 1, movie->num_actors);
+		insert_movie(graph, movie->movie_name);
+		__add_edges(graph, movie);
 
-		__addEdges(graph, movie);
-
-		__readLine(arq_input, line);
+		free(movie);
+		__read_line(arq_input, line);
 	}
-	if(DEBUG)
-		printf("%d atores contabilizados\n", graph->num_vertex);
-}
-
-int kb_word(GRAPH * graph) {
-	int kevin_bacon_index = getActorIndex(graph, "Bacon, Kevin");	
-	int * kb_index  = (int *) malloc(graph->num_vertex * sizeof(int));
-	int i, j;	
-	for(i =0; i < graph->num_vertex; i++) 
-		kb_index[i] = VAZIO;
-
-	kb_index[kevin_bacon_index] = 0; /* Colocando zero no Indice de Kb do Kevin Bacon */
-	int haveToContinue = 1, current_index = 0;
 	
-	/* Encontrando todos os indices de Kb */
-	while(haveToContinue) {
-		haveToContinue = 0;
+	fclose(arq_input);
+}
 
-		for(i = 0; i < graph->num_vertex; i++)
-			if(kb_index[i] == current_index)
-				for(j = 0; j < graph->num_vertex; j++)
-					if(are_adjacent(graph, i, j) && kb_index[j] == VAZIO) {
-						haveToContinue = 1;
-						kb_index[j] = current_index + 1;
-					}
+void kevin_bacon_number(GRAPH *graph) {
+	char actor_name[30];
+	printf("\n\tDigite o nome do ator: ");
+	scanf(" %[^\n]s", actor_name);
 
-		current_index++;
-	}
+	int path[100];
+	int result = get_kevin_bacon_number(graph, actor_name, path);
 
-	if(DEBUG) printf("Achei todos os Kbs\n");
+	if(result == KEVIN_BACON)
+		printf("\tEste é o próprio Kevin Bacon!\n");
 
-	int sum = 0;
-	for(i = 0; i < graph->num_vertex; i++) {
-		if(DEBUG)
-			printf("%s tem Kb = %d\n", graph->actors_names[i], kb_index[i]);
+	else if(result == NOT_FOUND)
+		printf("\tEste ator não tem ligação com Kevin Bacon...\n");
+
+	else if(result > 0) {
+		printf("\n");
+		char actor_name2[50], actor_name1[50], movie_name[60];
+		int i = result - 1;
+
+		for(; i > 0; i--) {
+			strcpy(actor_name1, graph->actors_names[path[i]]);
+			strcpy(actor_name2, graph->actors_names[path[i-1]]);
+
+			int movie_index = graph->edges[path[i-1]][path[i]];
+			strcpy(movie_name, graph->movies_names[movie_index]);
+
+			printf("\t%s atuou com %s em %s\n", actor_name1, actor_name2, movie_name);
+		}
 		
-		if(kb_index[i] != -1) 
-			sum += kb_index[i]; 
+		printf("\n\t%s tem KB = %d\n", actor_name, result - 1);
 	}
-
-	float averageKb = (float) sum / graph->num_vertex;
-	printf("\tA média de Kb dos atores é %.3f\n", averageKb);
-
-	float sum_dp = 0.0;
-	for(i = 0; i < graph->num_vertex; i++) {
-		if(DEBUG)
-			printf("%s tem Kb = %d\n", graph->actors_names[i], kb_index[i]);
-		
-		if(kb_index[i] != -1) 
-			sum_dp += (kb_index[i] - averageKb) * (kb_index[i] - averageKb); 
-	}
-
-	float dpKB = (float) sum_dp / graph->num_vertex;
-	printf("\tO desvio padrão de Kb dos atores é %.3f\n", dpKB);
 }
 
-
-int are_adjacent(GRAPH * graph, int v1, int v2) {
-	return graph->edges[v1][v2] != VAZIO ;
-}
-
-int replace_vertex(GRAPH * graph, int vertex_index, char * newName) {
-	if(!graph)return -3;
-	strcpy(graph->actors_names[vertex_index], newName);
-	return 1;
-}
-
-char * vertex_value(GRAPH * graph, int pos) {
-	if(!graph) return NULL;
-	return graph->actors_names[pos];
-	
-} 
-
-int edge_value(GRAPH * graph, int v1, int v2) {
-	if(!graph) return -3;
-	return graph->edges[v1][v2];
-}
-
-
-int replace_edge(GRAPH * graph, int v1, int v2, int elem) {
-	if(!graph) return -3;
-	graph->edges[v1][v2] = elem;
-	return 1;
+void kevin_bacon_average(GRAPH *graph) {
+	float *results = get_kevin_bacon_average(graph);
+	printf("\n\tMédia de KB = %.4f\n", results[0]);
+	printf("\tDesvio padrão de KB = %.4f\n", results[1]);
 }
