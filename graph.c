@@ -47,6 +47,23 @@ char * vertex_value(GRAPH * graph, int pos) {
 	return graph->actors_names[pos];	
 }
 
+/* retorna a referencia para os dois extremos da aresta */
+int * end_vertex(GRAPH *graph, int v1, int v2){
+	int **results = (int **) malloc(2 * sizeof(int *));
+	results[0] = &v1;
+	results[1] = &v2;
+	return results;
+}
+
+/* retorna o vertice oposto */
+int * opposite(GRAPH *graph, int origin, int edge) {
+	int i = 0;
+	for(; i < graph->num_vertex; i++)
+		if(graph->edges[origin][i] == edge)
+			return &graph->edges[origin][i];
+	return NULL;
+}
+
 /* insere uma aresta ligando dois atores pelo indice do filme */
 int * insert_edge (GRAPH *graph, int v1, int v2, int movie_index) {
 	graph->edges[v1][v2] = movie_index;
@@ -195,7 +212,7 @@ float * get_kevin_bacon_average(GRAPH * graph) {
 		if(kb_index[i] != VAZIO) 
 			sum += (kb_index[i] - result[0]) * (kb_index[i] - result[0]);
 	
-	result[1] = sqrt((double) sum / graph->num_vertex); /* desvio padrao */
+	result[1] = sqrt((double) sum / graph->num_vertex);	/* desvio padrao */
 
 	return result;
 }

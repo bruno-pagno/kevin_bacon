@@ -33,7 +33,10 @@ GRAPH * create_graph();
 
 int insert_vertex(GRAPH *, char *);
 int replace_vertex(GRAPH *, int, char *);
-char * vertex_value(GRAPH *, int); 
+char * vertex_value(GRAPH *, int);
+
+int * end_vertex(GRAPH *, int, int);
+int * opposite(GRAPH *, int, int);
 
 int * insert_edge(GRAPH *, int, int, int);
 int replace_edge(GRAPH *, int, int, int);
