@@ -1,5 +1,5 @@
 all:
-	gcc *.c *.h -I . -ansi -o kevin_bacon
+	gcc *.c *.h -I . -ansi -o kevin_bacon -lm
 	./kevin_bacon
 
 compile:

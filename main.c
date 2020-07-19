@@ -9,6 +9,7 @@ Disciplina: SCC0503
 #include <stdlib.h>
 #include <string.h>
 #include <graph.h>
+#include <math.h>
 #include <queue.h>
 
 #define DEBUG 0
@@ -171,12 +172,13 @@ int kb_word(GRAPH * graph) {
 		if(DEBUG)
 			printf("%s tem Kb = %d\n", graph->actors_names[i], kb_index[i]);
 		
-		if(kb_index[i] != -1) 
+		if(kb_index[i] != -1) {
 			sum_dp += (kb_index[i] - averageKb) * (kb_index[i] - averageKb); 
+		}
 	}
 
-	float dpKB = (float) sum_dp / graph->num_vertex;
-	printf("\tO desvio padrão de Kb dos atores é %.3f\n", dpKB);
+	float dpKB = sqrt((double) sum_dp / graph->num_vertex);
+	printf("\tO desvio padrão de Kb dos atores é %.4f\n", dpKB);
 }
 
 
