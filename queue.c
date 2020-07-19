@@ -1,4 +1,10 @@
-#include <stdio.h>
+/*
+Nome: Bruno de Sousa Pagno		NUSP: 11366872
+Nome: João Vitor de Mello Gomes	NUSP: 11218622
+Professor: Elaine Parros Machado de Sousa
+Disciplina: SCC0503
+*/
+
 #include <stdlib.h>
 #include "queue.h"
 
@@ -38,22 +44,6 @@ int pop_queue(QUEUE *queue) {
 	queue->size--;
 
 	return first->value;
-}
-
-/* mostra a fila */
-int display_queue(QUEUE *queue) {
-	if(!queue) 
-		return FAILED;
-
-	printf("Fila com %d elementos: [ ", queue->size);
-	QUEUE_ELEM *element = queue->first;
-	while(element) {
-		printf("%d ", element->value);
-		element = element->next;
-	}
-	printf("]\n");
-
-	return SUCCESS;
 }
 
 void free_queue(QUEUE *queue) {

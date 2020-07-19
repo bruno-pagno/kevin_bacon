@@ -1,3 +1,10 @@
+/*
+Nome: Bruno de Sousa Pagno		NUSP: 11366872
+Nome: João Vitor de Mello Gomes	NUSP: 11218622
+Professor: Elaine Parros Machado de Sousa
+Disciplina: SCC0503
+*/
+
 #ifndef _QUEUE_
 #define _QUEUE_
 
@@ -22,7 +29,6 @@ typedef struct {
 QUEUE * create_queue();
 int push_queue(QUEUE *, int);
 int pop_queue(QUEUE *);
-int display_queue(QUEUE *);
 void free_queue(QUEUE *);
 
 #endif
